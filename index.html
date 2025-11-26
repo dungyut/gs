@@ -414,6 +414,22 @@
             50% { opacity: 1; transform: scale(1); }
             100% { opacity: 0; transform: scale(0); }
         }
+        #adminGiftBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 70px;
+    height: 70px;
+    background: url('giftbag.png') no-repeat center/cover;
+    cursor: pointer;
+    display: none; /* ẩn mặc định */
+    z-index: 99999;
+    transition: transform 0.3s;
+}
+#adminGiftBtn:hover {
+    transform: scale(1.2);
+}
+
     </style>
 </head>
 <body>
@@ -448,7 +464,7 @@
         <textarea id="wishInput" placeholder="Nhập điều ước của bạn..."></textarea>
         <button id="sendBtn">Gửi Điều Ước 🎁</button>
     </div>
-
+<div id="adminGiftBtn"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         const greetings = [
@@ -974,6 +990,84 @@ canvas3d.addEventListener('touchstart', function(e) {
         canvas3d.dispatchEvent(simulatedEvent);
     }
 }, {passive: false});
+// =============================
+// KIỂM TRA TỪ THIẾT BỊ ĐÃ GỬI THƯ CHƯA
+// =============================
+const hint = document.getElementById("hintText");
+const letterBox = document.getElementById("letter");
+const wishInput = document.getElementById("wishInput");
+const sendBtn = document.getElementById("sendBtn");
+const adminBtn = document.getElementById("adminGiftBtn");
+
+// Nếu đã từng gửi → khoá lại + đổi dòng chữ
+function checkWishStatus() {
+    const sent = localStorage.getItem("wishSent");
+    if (sent === "true") {
+        hint.innerHTML = "✨ đã gửi mong muốn, hết cơ hội ồi ✨";
+        if (wishInput) wishInput.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
+    }
+}
+checkWishStatus();
+
+
+// =============================
+// XỬ LÝ BẤM GỬI THƯ
+// =============================
+sendBtn.addEventListener("click", () => {
+    const text = wishInput.value.trim();
+
+    if (text === "") {
+        alert("Bạn yêu chưa nhập điều ước kìa 😭");
+        return;
+    }
+
+    // Lưu localStorage
+    localStorage.setItem("wishSent", "true");
+    localStorage.setItem("wishText", text);
+
+    // Đổi dòng chữ thông báo
+    hint.innerHTML = "✨ đã gửi mong muốn, hết cơ hội ồi ✨";
+
+    // Tắt nút gửi + khoá input
+    sendBtn.disabled = true;
+    wishInput.disabled = true;
+
+    // Tạo hiệu ứng máy bay bay
+    sendLetterAnimation();
+
+    // Sau khi bay xong 2s → hiện nút túi Noel cho chủ xem thư
+    setTimeout(() => {
+        adminBtn.style.display = "block";
+    }, 2000);
+});
+
+
+
+adminBtn.addEventListener("click", () => {
+    const saved = localStorage.getItem("wishText") || "(không có dữ liệu)";
+
+    alert("🎄 Điều ước người dùng gửi là:\n\n" + saved);
+});
+
+
+function sendLetterAnimation() {
+    const plane = document.createElement("div");
+    plane.className = "paper-plane";
+    document.body.appendChild(plane);
+
+    plane.style.left = "50%";
+    plane.style.top = "50%";
+    plane.style.display = "block";
+
+    plane.style.animation = "foldPaper 0.8s ease-out, flyAroundTree 3s ease-in-out 0.8s forwards";
+
+    setTimeout(() => {
+        plane.remove();
+        letterBox.style.display = "none";
+    }, 3500);
+}
+
     </script>
 </body>
 </html>
