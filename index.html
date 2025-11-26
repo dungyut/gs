@@ -756,16 +756,30 @@
             document.getElementById('hintText').style.display = 'none';
         }
 
-        document.getElementById('sendBtn').addEventListener('click', function() {
-            const wish = document.getElementById('wishInput').value.trim();
-            if (wish) {
-                localStorage.setItem('christmasWish', wish);
-                hasSubmittedWish = true;
-                
-                const letterDiv = document.getElementById('letter');
-                createPaperPlane(letterDiv);
-            }
-        });
+       document.getElementById('sendBtn').addEventListener('click', function() {
+    const wish = document.getElementById('wishInput').value.trim();
+    if (!wish) return;
+
+    // Lưu local như cũ (để người gửi vẫn thấy hiệu ứng bay)
+    localStorage.setItem('christmasWish', wish);
+    hasSubmittedWish = true;
+
+    // Gửi về Gmail của bạn ngay lập tức
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfc-bYBLTB_y2iR3dycXROBmr-V_-0Q7sxlgeupDPZx-wA1TQ/viewform?usp=dialog0example1234567890/formResponse";
+    const entryID = "entry.1787298460";  // thay bằng entry ID thật của bạn
+
+    fetch(formUrl, {
+        method: "POST",
+        mode: "no-cors",
+        body: new URLSearchParams({
+            [entryID]: "🎄 " + wish + " 🎄\n\n(được gửi lúc " + new Date().toLocaleString("vi-VN") + ")"
+        })
+    });
+
+    // Hiệu ứng máy bay giấy như cũ
+    const letterDiv = document.getElementById('letter');
+    createPaperPlane(letterDiv);
+});
 
         function createPaperPlane(letterDiv) {
             letterDiv.style.animation = 'foldPaper 1.5s ease-in-out';
