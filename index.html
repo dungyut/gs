@@ -999,13 +999,24 @@ const wishInput = document.getElementById("wishInput");
 const sendBtn = document.getElementById("sendBtn");
 const adminBtn = document.getElementById("adminGiftBtn");
 
+// Khóa bí mật OWNER - ĐÂY LÀ MÃ BẠN SẼ GÕ ĐỂ KÍCH HOẠT CHẾ ĐỘ OWNER
+const OWNER_CODE = "dungyutt"; // <--- BẠN CÓ THỂ ĐỔI THÀNH CODE BẤT KỲ
+
 // Nếu đã từng gửi → khoá lại + đổi dòng chữ
 function checkWishStatus() {
     const sent = localStorage.getItem("wishSent");
-    if (sent === "true") {
-        hint.innerHTML = "✨ đã gửi mong muốn, hết cơ hội ồi ✨";
+    const isOwner = localStorage.getItem("isOwner"); // Thêm kiểm tra Owner
+
+    if (sent === "true" || isOwner === "true") { // Kiểm tra cả sent và isOwner
+        hint.innerHTML = isOwner === "true"
+            ? "👑 Chào Mừng Owner! Túi quà đang đợi bạn 👑" 
+            : "✨ đã gửi mong muốn, hết cơ hội ồi ✨";
+            
         if (wishInput) wishInput.disabled = true;
         if (sendBtn) sendBtn.disabled = true;
+        
+        // LUÔN HIỆN NÚT ADMIN NẾU LÀ OWNER HOẶC ĐÃ GỬI
+        adminBtn.style.display = "block"; 
     }
 }
 checkWishStatus();
@@ -1021,11 +1032,33 @@ sendBtn.addEventListener("click", () => {
         alert("Bạn yêu chưa nhập điều ước kìa 😭");
         return;
     }
+    
+    // --- BỔ SUNG LOGIC KIỂM TRA MÃ OWNER ---
+    if (text.toLowerCase() === OWNER_CODE) {
+        localStorage.setItem("isOwner", "true"); // Lưu trạng thái Owner
+        
+        // Vô hiệu hóa form
+        sendBtn.disabled = true;
+        wishInput.disabled = true;
+        
+        // Hiển thị nút Owner và thông báo
+        adminBtn.style.display = "block";
+        letterBox.classList.remove('show');
+        document.getElementById('hintText').style.display = 'block';
+        hint.innerHTML = "👑 Chào Mừng Owner! Túi quà đang đợi bạn 👑";
 
-    // Lưu localStorage
+        alert("Khóa Owner đã được kích hoạt. Bạn có thể bấm túi quà để xem thư.");
+        return; // Thoát khỏi hàm để KHÔNG gửi mã Owner lên Google Sheet
+    }
+    // --- KẾT THÚC LOGIC OWNER ---
+
+    // [PHẦN GỬI THƯ THÔNG THƯỜNG]
+    // ** LƯU Ý: ĐẢM BẢO LOGIC FETCH (GỬI ĐẾN GOOGLE SHEET) CỦA BẠN VẪN Ở ĐÂY **
+    
+    // Lưu localStorage (cho Khách)
     localStorage.setItem("wishSent", "true");
     localStorage.setItem("wishText", text);
-
+    
     // Đổi dòng chữ thông báo
     hint.innerHTML = "✨ đã gửi mong muốn, hết cơ hội ồi ✨";
 
@@ -1035,7 +1068,7 @@ sendBtn.addEventListener("click", () => {
 
     // Tạo hiệu ứng máy bay bay
     sendLetterAnimation();
-
+    
     // Sau khi bay xong 2s → hiện nút túi Noel cho chủ xem thư
     setTimeout(() => {
         adminBtn.style.display = "block";
