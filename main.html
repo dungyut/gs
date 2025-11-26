@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giáng Sinh Kỳ Diệu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 50%, #bbdefb 100%);
+            height: 100vh;
+        }
+
+        #startScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s;
+        }
+
+        #startScreen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .start-content {
+            text-align: center;
+            color: white;
+        }
+
+        .start-title {
+            font-size: 64px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.8);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.5); }
+            50% { text-shadow: 0 0 30px rgba(255,215,0,1), 0 0 60px rgba(255,215,0,0.8); }
+        }
+
+        .start-btn {
+            padding: 20px 60px;
+            font-size: 32px;
+            background: linear-gradient(135deg, #c62828, #e53935);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(198,40,40,0.5);
+            transition: all 0.3s;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(198,40,40,0.7);
+        }
+
+        .instruction {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #ffd700;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #messages {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        .greeting {
+            font-size: 56px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #c62828, #e53935, #ff5722, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: fadeInOut 2s ease-in-out, rainbow 3s linear infinite;
+            margin: 20px 0;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        #giftBox {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            display: none;
+            z-index: 100;
+            transition: transform 0.3s;
+            animation: giftAppear 1s ease-out, giftFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes giftAppear {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(180deg); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+
+        @keyframes giftFloat {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+            50% { transform: translate(-50%, -50%) translateY(-20px); }
+        }
+
+        #giftBox:hover {
+            transform: translate(-50%, -50%) scale(1.15);
+            filter: brightness(1.2);
+        }
+
+        .gift {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e53935 0%, #c62828 50%, #b71c1c 100%);
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4), 
+                        inset 0 -5px 15px rgba(0,0,0,0.2),
+                        inset 0 5px 15px rgba(255,255,255,0.2);
+        }
+
+        .ribbon-v {
+            position: absolute;
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        .ribbon-h {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(180deg, #ffd700, #ffed4e, #ffd700);
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        .bow {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 60px;
+            background: radial-gradient(circle, #ffd700, #ffed4e);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 5px 20px rgba(255,215,0,0.6);
+        }
+
+        .bow::before, .bow::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #ffd700;
+            border-radius: 50%;
+            top: 5px;
+        }
+
+        .bow::before {
+            left: -25px;
+        }
+
+        .bow::after {
+            right: -25px;
+        }
+
+        #canvas3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        #canvas3d.show {
+            opacity: 1;
+        }
+
+        .falling-item {
+            position: absolute;
+            top: -50px;
+            pointer-events: none;
+            z-index: 50;
+            font-size: 30px;
+        }
+
+        #letter {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            max-width: 90%;
+            background: linear-gradient(135deg, #fffef0, #fff8dc);
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5), 
+                        inset 0 1px 0 rgba(255,255,255,0.6);
+            display: none;
+            z-index: 200;
+            border: 3px solid #ffd700;
+        }
+
+        #letter.show {
+            display: block;
+            animation: letterAppear 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes letterAppear {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.3) rotate(720deg);
+            }
+            60% {
+                transform: translate(-50%, -50%) scale(1.1) rotate(-10deg);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+        }
+
+        #letter h2 {
+            color: #c62828;
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #letter p {
+            color: #444;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        #letter textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 3px solid #ffd700;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 25px;
+            background: white;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #letter button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #c62828 0%, #e53935 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(198,40,40,0.4);
+        }
+
+        #letter button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(198,40,40,0.6);
+        }
+
+        .note {
+            font-size: 13px;
+            color: #e53935;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            background: rgba(229,57,53,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .paper-plane {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 50px solid #fffef0;
+            display: none;
+            z-index: 300;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+        }
+
+        @keyframes foldPaper {
+            0% { transform: translate(-50%, -50%) scale(1) rotateY(0deg); }
+            50% { transform: translate(-50%, -50%) scale(0.5) rotateY(180deg); }
+            100% { transform: translate(-50%, -50%) scale(0.8) rotateY(360deg); }
+        }
+
+        @keyframes flyAroundTree {
+            0% { 
+                top: 50%; 
+                left: 50%; 
+                transform: translate(-50%, -50%) rotateZ(45deg) scale(1);
+                opacity: 1;
+            }
+            15% { 
+                top: 30%; 
+                left: 60%; 
+                transform: translate(-50%, -50%) rotateZ(90deg) rotateY(180deg) scale(1.1);
+            }
+            30% { 
+                top: 25%; 
+                left: 75%; 
+                transform: translate(-50%, -50%) rotateZ(135deg) rotateY(360deg) scale(1);
+            }
+            45% { 
+                top: 45%; 
+                left: 85%; 
+                transform: translate(-50%, -50%) rotateZ(180deg) rotateY(180deg) scale(0.9);
+            }
+            60% { 
+                top: 65%; 
+                left: 75%; 
+                transform: translate(-50%, -50%) rotateZ(225deg) rotateY(360deg) scale(0.85);
+            }
+            75% { 
+                top: 70%; 
+                left: 60%; 
+                transform: translate(-50%, -50%) rotateZ(270deg) rotateY(180deg) scale(0.8);
+            }
+            85% { 
+                top: 55%; 
+                left: 45%; 
+                transform: translate(-50%, -50%) rotateZ(315deg) rotateY(360deg) scale(0.75);
+            }
+            92% { 
+                top: 35%; 
+                left: 35%; 
+                transform: translate(-50%, -50%) rotateZ(360deg) rotateY(180deg) scale(0.7);
+            }
+            100% { 
+                top: -15%; 
+                left: 150%; 
+                transform: translate(-50%, -50%) rotateZ(405deg) rotateY(360deg) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 250;
+        }
+
+        @keyframes sparkleAnim {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="startScreen">
+        <div class="start-content">
+            <div class="start-title">🎄 giáng sinh đến chơi nà 🎄</div>
+            <button class="start-btn" id="startBtn">START</button>
+            <div class="instruction">👆 Hãy nhấn vào màn hình để bắt đầu trải nghiệm</div>
+        </div>
+    </div>
+
+    <div id="hintText">🎁 Hãy truy tìm món quà bí mật trên cây thông =)) Có thể zoom nhé! 🔍✨</div>
+
+    <audio id="bgMusic" loop>
+        <source src="gs.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="messages"></div>
+    <div id="giftBox">
+        <div class="gift">
+            <div class="ribbon-v"></div>
+            <div class="ribbon-h"></div>
+            <div class="bow"></div>
+        </div>
+    </div>
+    <canvas id="canvas3d"></canvas>
+
+    <div id="letter">
+        <h2>🎅 Điều Ước Giáng Sinh 🎅</h2>
+        <p>Ông già Noel cho phép bạn đặt 1 đơn bất kì mà bạn muốn</p>
+        <p class="note">⚠️ Lưu ý: Chỉ được nhập 1 lần duy nhất và món quà sẽ hết hạn sau ngày 26/12 nên hãy suy nghĩ cho kĩ!</p>
+        <textarea id="wishInput" placeholder="Nhập điều ước của bạn..."></textarea>
+        <button id="sendBtn">Gửi Điều Ước 🎁</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const greetings = [
+            "🎄 MÙA ĐÔNG ĐẾN ÒI 🎄",
+            "✨ TRỜI TRỞ LẠNH Á ✨",
+            "🎅 NHỚ MẶC ẤM NHA 🎅",
+            "❄️ ỐM LÀ TUI BÙN VÔ CÙNG ÁA ❄️"
+        ];
+
+        let clickCount = 0;
+        let scene, camera, renderer, tree, star;
+        let starGroup;
+        let hasSubmittedWish = localStorage.getItem('christmasWish') !== null;
+        const music = document.getElementById('bgMusic');
+        let canClick = false;
+
+        document.getElementById('startBtn').addEventListener('click', function() {
+            document.getElementById('startScreen').classList.add('hidden');
+            canClick = true;
+            music.play().catch(e => console.log('Audio play failed:', e));
+            setTimeout(() => {
+                document.getElementById('startScreen').remove();
+            }, 500);
+        });
+
+        document.body.addEventListener('click', handleClick);
+
+        function handleClick(e) {
+            if (!canClick || clickCount >= 4) return;
+            
+            showGreeting();
+            clickCount++;
+            
+            if (clickCount === 4) {
+                setTimeout(() => {
+                    document.getElementById('messages').style.display = 'none';
+                    const giftBox = document.getElementById('giftBox');
+                    giftBox.style.display = 'block';
+                    canClick = false;
+                }, 2000);
+            }
+        }
+
+        function showGreeting() {
+            const messagesDiv = document.getElementById('messages');
+            const greeting = document.createElement('div');
+            greeting.className = 'greeting';
+            greeting.textContent = greetings[clickCount];
+            messagesDiv.appendChild(greeting);
+
+            setTimeout(() => {
+                if (greeting.parentNode) {
+                    greeting.remove();
+                }
+            }, 2000);
+        }
+
+        document.getElementById('giftBox').addEventListener('click', function() {
+            this.style.animation = 'none';
+            this.style.transform = 'translate(-50%, -50%) scale(0) rotate(360deg)';
+            this.style.opacity = '0';
+            this.style.transition = 'all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            setTimeout(() => {
+                this.style.display = 'none';
+                const canvas3d = document.getElementById('canvas3d');
+                canvas3d.style.display = 'block';
+                setTimeout(() => canvas3d.classList.add('show'), 50);
+                init3DScene();
+                startFalling();
+                
+                // Hiện dòng chữ gợi ý
+                const hintText = document.getElementById('hintText');
+                hintText.style.display = 'block';
+                
+                // Ẩn dòng chữ sau khi người dùng tìm thấy ngôi sao
+                setTimeout(() => {
+                    if (!hasSubmittedWish) {
+                        hintText.style.display = 'none';
+                    }
+                }, 60000); // Ẩn sau 60 giây nếu chưa tìm thấy
+            }, 1000);
+        });
+
+        function init3DScene() {
+            const canvas = document.getElementById('canvas3d');
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+            
+            const pointLight1 = new THREE.PointLight(0xffffff, 1);
+            pointLight1.position.set(5, 10, 5);
+            scene.add(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0xffccaa, 0.5);
+            pointLight2.position.set(-5, 5, -5);
+            scene.add(pointLight2);
+
+            tree = new THREE.Group();
+
+            // Thân cây
+            const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.5, 2.5, 12);
+            const trunkMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x654321,
+                shininess: 5 
+            });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.y = 1.25;
+            tree.add(trunk);
+
+            // Các tầng lá với chi tiết hơn
+            const colors = [0x0d5e0d, 0x0a470a, 0x073007];
+            const sizes = [3.5, 2.5, 1.7];
+            const heights = [3, 3, 2.5];
+            const positions = [2.5, 4.5, 6.2];
+
+            for (let i = 0; i < 3; i++) {
+                const coneGeometry = new THREE.ConeGeometry(sizes[i], heights[i], 12);
+                const coneMaterial = new THREE.MeshPhongMaterial({ 
+                    color: colors[i],
+                    shininess: 30
+                });
+                const cone = new THREE.Mesh(coneGeometry, coneMaterial);
+                cone.position.y = positions[i];
+                tree.add(cone);
+            }
+
+            // Thêm các hình ảnh trang trí
+            const textureLoader = new THREE.TextureLoader();
+            const ornamentPositions = [
+                { x: 2, y: 3, z: 0, img: '1.png' },
+                { x: -2, y: 3.5, z: 0.5, img: '2.png' },
+                { x: 0, y: 4, z: -2, img: '3.png' },
+                { x: 1.5, y: 5, z: 1, img: '4.png' },
+                { x: -1.2, y: 5.5, z: -0.5, img: '5.png' },
+                { x: 0.8, y: 2.8, z: -1.5, img: '1.png' },
+                { x: -1.5, y: 4.5, z: 1.2, img: '2.png' },
+            ];
+
+            ornamentPositions.forEach(pos => {
+                textureLoader.load(
+                    pos.img,
+                    (texture) => {
+                        const geometry = new THREE.PlaneGeometry(0.6, 0.6);
+                        const material = new THREE.MeshBasicMaterial({ 
+                            map: texture, 
+                            transparent: true,
+                            side: THREE.DoubleSide
+                        });
+                        const mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.set(pos.x, pos.y, pos.z);
+                        mesh.lookAt(camera.position);
+                        tree.add(mesh);
+                    },
+                    undefined,
+                    () => {
+                        // Nếu không load được ảnh, dùng hình cầu màu sắc
+                        const geometry = new THREE.SphereGeometry(0.3, 16, 16);
+                        const material = new THREE.MeshPhongMaterial({ 
+                            color: Math.random() > 0.5 ? 0xff0000 : 0xffd700,
+                            emissive: Math.random() > 0.5 ? 0xff0000 : 0xffd700,
+                            emissiveIntensity: 0.5,
+                            shininess: 100
+                        });
+                        const mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.set(pos.x, pos.y, pos.z);
+                        tree.add(mesh);
+                    }
+                );
+            });
+
+            // Thêm đèn trang trí nhấp nháy
+            for (let i = 0; i < 20; i++) {
+                const ornamentGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+                const color = [0xff0000, 0x0000ff, 0xffd700, 0xff69b4][Math.floor(Math.random() * 4)];
+                const ornamentMaterial = new THREE.MeshPhongMaterial({ 
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.8,
+                    shininess: 100
+                });
+                const ornament = new THREE.Mesh(ornamentGeometry, ornamentMaterial);
+                const angle = (i / 20) * Math.PI * 2;
+                const radius = 1 + Math.random() * 1.5;
+                const height = 2.5 + Math.random() * 4;
+                ornament.position.set(
+                    Math.cos(angle) * radius,
+                    height,
+                    Math.sin(angle) * radius
+                );
+                ornament.userData.blinkOffset = Math.random() * Math.PI * 2;
+                tree.add(ornament);
+            }
+
+            // Ngôi sao đẹp hơn
+            starGroup = new THREE.Group();
+            
+            const starShape = new THREE.Shape();
+            const outerRadius = 0.6;
+            const innerRadius = 0.25;
+            const points = 5;
+            
+            for (let i = 0; i < points * 2; i++) {
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const angle = (i * Math.PI) / points - Math.PI / 2;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                if (i === 0) starShape.moveTo(x, y);
+                else starShape.lineTo(x, y);
+            }
+            starShape.closePath();
+
+            const extrudeSettings = { 
+                depth: 0.3, 
+                bevelEnabled: true, 
+                bevelThickness: 0.08, 
+                bevelSize: 0.08,
+                bevelSegments: 3
+            };
+            const starGeometry = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+            const starMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xffd700,
+                emissive: 0xffff00,
+                emissiveIntensity: 1,
+                shininess: 100,
+                specular: 0xffffff
+            });
+            star = new THREE.Mesh(starGeometry, starMaterial);
+            star.rotation.z = -Math.PI / 2;
+            starGroup.add(star);
+
+            const starLight = new THREE.PointLight(0xffff00, 2, 5);
+            starGroup.add(starLight);
+
+            starGroup.position.y = 7.5;
+            tree.add(starGroup);
+
+            scene.add(tree);
+            camera.position.set(0, 4, 14);
+            camera.lookAt(0, 4, 0);
+
+            canvas.addEventListener('click', onCanvasClick);
+            
+            animate();
+        }
+
+        function onCanvasClick(event) {
+    if (hasSubmittedWish) return;
+    if (!renderer || !camera || !starGroup) return;
+
+    const canvas = renderer.domElement;
+    const rect = canvas.getBoundingClientRect();
+
+    const mouse = new THREE.Vector2();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(starGroup.children, true);
+
+    if (intersects.length > 0 && !document.getElementById('letter').classList.contains('show')) {
+        showLetter();
+        createSparkles(event.clientX, event.clientY);
+        starGroup.userData.found = true;  // đánh dấu đã tìm thấy
+    }
+}
+
+        function createSparkles(x, y) {
+            for (let i = 0; i < 30; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = x + 'px';
+                sparkle.style.top = y + 'px';
+                sparkle.style.background = ['#ffd700', '#ff6b6b', '#4ecdc4', '#ffe66d'][Math.floor(Math.random() * 4)];
+                document.body.appendChild(sparkle);
+
+                const angle = (Math.PI * 2 * i) / 30;
+                const distance = 50 + Math.random() * 100;
+                const targetX = x + Math.cos(angle) * distance;
+                const targetY = y + Math.sin(angle) * distance;
+
+                sparkle.animate([
+                    { left: x + 'px', top: y + 'px', opacity: 1, transform: 'scale(0)' },
+                    { left: targetX + 'px', top: targetY + 'px', opacity: 0, transform: 'scale(1.5)' }
+                ], {
+                    duration: 1000 + Math.random() * 500,
+                    easing: 'cubic-bezier(0, .9, .57, 1)'
+                });
+
+                setTimeout(() => sparkle.remove(), 1500);
+            }
+        }
+
+        function showLetter() {
+            const letter = document.getElementById('letter');
+            letter.classList.add('show');
+            
+            // Ẩn dòng chữ gợi ý khi đã tìm thấy
+            document.getElementById('hintText').style.display = 'none';
+        }
+
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            const wish = document.getElementById('wishInput').value.trim();
+            if (wish) {
+                localStorage.setItem('christmasWish', wish);
+                hasSubmittedWish = true;
+                
+                const letterDiv = document.getElementById('letter');
+                createPaperPlane(letterDiv);
+            }
+        });
+
+        function createPaperPlane(letterDiv) {
+            letterDiv.style.animation = 'foldPaper 1.5s ease-in-out';
+            
+            setTimeout(() => {
+                letterDiv.style.display = 'none';
+                
+                const plane = document.createElement('div');
+                plane.className = 'paper-plane';
+                
+                const planeBody = document.createElement('div');
+                planeBody.className = 'plane-body';
+                
+                const wingLeft = document.createElement('div');
+                wingLeft.className = 'plane-wing-left';
+                
+                const wingRight = document.createElement('div');
+                wingRight.className = 'plane-wing-right';
+                
+                planeBody.appendChild(wingLeft);
+                planeBody.appendChild(wingRight);
+                plane.appendChild(planeBody);
+                
+                plane.style.display = 'block';
+                plane.style.top = '50%';
+                plane.style.left = '50%';
+                plane.style.transform = 'translate(-50%, -50%)';
+                document.body.appendChild(plane);
+
+                // Tạo hiệu ứng trail
+                const trailInterval = setInterval(() => {
+                    const trail = document.createElement('div');
+                    trail.className = 'sparkle';
+                    trail.style.left = plane.offsetLeft + 'px';
+                    trail.style.top = plane.offsetTop + 'px';
+                    trail.style.background = '#ffd700';
+                    trail.style.width = '6px';
+                    trail.style.height = '6px';
+                    document.body.appendChild(trail);
+                    
+                    trail.animate([
+                        { opacity: 1, transform: 'scale(1)' },
+                        { opacity: 0, transform: 'scale(0)' }
+                    ], {
+                        duration: 800,
+                        easing: 'ease-out'
+                    });
+                    
+                    setTimeout(() => trail.remove(), 800);
+                }, 50);
+
+                setTimeout(() => {
+                    plane.style.animation = 'flyAroundTree 5s cubic-bezier(0.42, 0, 0.58, 1) forwards';
+                    
+                    setTimeout(() => {
+                        clearInterval(trailInterval);
+                        plane.remove();
+                    }, 5000);
+                }, 100);
+            }, 1500);
+        }
+
+        let starBlinkState = 0;
+        let treeRotation = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (tree) {
+                treeRotation += 0.005;
+                tree.rotation.y = treeRotation;
+
+                // Làm đèn nhấp nháy
+                tree.children.forEach(child => {
+                    if (child.geometry && child.geometry.type === 'SphereGeometry' && child.userData.blinkOffset !== undefined) {
+                        const blink = Math.sin(Date.now() * 0.003 + child.userData.blinkOffset);
+                        child.material.emissiveIntensity = 0.4 + blink * 0.4;
+                    }
+                });
+            }
+
+            if (starGroup && !hasSubmittedWish && !starGroup.userData.found) {
+                starBlinkState += 0.08;
+                const scale = 1 + Math.sin(starBlinkState) * 0.25;
+                starGroup.scale.set(scale, scale, scale);
+                star.material.emissiveIntensity = 0.7 + Math.sin(starBlinkState) * 0.5;
+                starGroup.rotation.z += 0.03;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function startFalling() {
+            setInterval(() => {
+                const item = document.createElement('div');
+                item.className = 'falling-item';
+                const items = ['❄️', '🎁', '⛄', '❄️', '🎁'];
+                item.textContent = items[Math.floor(Math.random() * items.length)];
+                item.style.left = Math.random() * window.innerWidth + 'px';
+                item.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                item.style.opacity = Math.random() * 0.5 + 0.5;
+                document.body.appendChild(item);
+
+                const fallDistance = window.innerHeight + 50;
+                const duration = (Math.random() * 4 + 3) * 1000;
+                const swing = (Math.random() - 0.5) * 100;
+                
+                let pos = -50;
+                let startTime = Date.now();
+                const interval = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    pos = -50 + (fallDistance * elapsed / duration);
+                    const swingOffset = Math.sin(elapsed / 500) * swing;
+                    item.style.top = pos + 'px';
+                    item.style.transform = `translateX(${swingOffset}px) rotate(${elapsed / 10}deg)`;
+                    
+                    if (pos > fallDistance) {
+                        clearInterval(interval);
+                        item.remove();
+                    }
+                }, 16);
+            }, 300);
+        }
+
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
+        document.getElementById('canvas3d').addEventListener('wheel', (e) => {
+            e.preventDefault();
+            camera.position.z += e.deltaY * 0.01;
+            camera.position.z = Math.max(8, Math.min(20, camera.position.z));
+        });
+        // Hỗ trợ chạm tay trên điện thoại
+document.getElementById('canvas3d').addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('click', {
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            bubbles: true
+        });
+        this.dispatchEvent(mouseEvent);
+    }
+});
+
+// Zoom bằng 2 ngón tay (pinch)
+let initialDistance = 0;
+document.getElementById('canvas3d').addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+    }
+}, {passive: false});
+
+document.getElementById('canvas3d').addEventListener('touchmove', e => {
+    if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        const delta = currentDistance - initialDistance;
+        camera.position.z = Math.max(8, Math.min(25, camera.position.z - delta * 0.05));
+        initialDistance = currentDistance;
+    }
+}, {passive: false});
+// Hỗ trợ chạm tay + pinch zoom trên điện thoại (bắt buộc!)
+const canvas3d = document.getElementById('canvas3d');
+
+// Chạm tay = click
+canvas3d.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const simulatedEvent = new MouseEvent('click', {
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            bubbles: true,
+            cancelable: true
+        });
+        canvas3d.dispatchEvent(simulatedEvent);
+    }
+}, {passive: false});
+    </script>
+</body>
+</html>
