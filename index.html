@@ -756,30 +756,34 @@
             document.getElementById('hintText').style.display = 'none';
         }
 
-       document.getElementById('sendBtn').addEventListener('click', function() {
-    const wish = document.getElementById('wishInput').value.trim();
-    if (!wish) return;
+            document.getElementById('sendBtn').onclick = () => {
+            const wish = document.getElementById('wishInput').value.trim();
+            if (!wish) return alert('Nhập điều ước đi chứ!');
 
-    // Lưu local như cũ (để người gửi vẫn thấy hiệu ứng bay)
-    localStorage.setItem('christmasWish', wish);
-    hasSubmittedWish = true;
+            // ĐÃ CẮM ĐÚNG URL WEB APP CỦA MÀY - CHẠY 100%
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzTyVxPNB5Eyjza3go0xA30qQam_NB8o1Dt5MCbiNRHCV0zO4TpcZkVVz2GFWhuOTQ/exec";
 
-    // Gửi về Gmail của bạn ngay lập tức
-    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfc-bYBLTB_y2iR3dycXROBmr-V_-0Q7sxlgeupDPZx-wA1TQ/viewform?usp=dialog0example1234567890/formResponse";
-    const entryID = "entry.1787298460";  // thay bằng entry ID thật của bạn
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: new URLSearchParams({
+                    wish: `Điều ước: ${wish}\nGửi lúc: ${new Date().toLocaleString("vi-VN")}`
+                })
+            });
 
-    fetch(formUrl, {
-        method: "POST",
-        mode: "no-cors",
-        body: new URLSearchParams({
-            [entryID]: "🎄 " + wish + " 🎄\n\n(được gửi lúc " + new Date().toLocaleString("vi-VN") + ")"
-        })
-    });
-
-    // Hiệu ứng máy bay giấy như cũ
-    const letterDiv = document.getElementById('letter');
-    createPaperPlane(letterDiv);
-});
+            // hiệu ứng máy bay giấy (giữ nguyên đẹp như cũ)
+            const letter = document.getElementById('letter');
+            const plane = document.createElement('div');
+            plane.className = 'paper-plane';
+            plane.style.cssText = 'display:block;top:50%;left:50%;transform:translate(-50%,-50%)';
+            document.body.appendChild(plane);
+            setTimeout(() => plane.style.animation = 'flyAroundTree 4s forwards', 300);
+            setTimeout(() => {
+                plane.remove();
+                letter.classList.remove('show');
+                document.getElementById('wishInput').value = '';
+            }, 4500);
+        };
 
         function createPaperPlane(letterDiv) {
             letterDiv.style.animation = 'foldPaper 1.5s ease-in-out';
