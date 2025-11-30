@@ -1077,24 +1077,25 @@ sendBtn.addEventListener("click", () => {
 
 
 
-adminBtn.addEventListener("click", () => {
-    fetch("https://script.google.com/macros/s/AKfycbz04stS82Gfyba9vkn8aXQAL4yGqAuQg-amNtZkJt-ybBi9Hc5fINTUkGG6hbI4P3p_/exec")  // ✅ URL MỚI
-        .then(res => res.json())
-        .then(data => {
-            // Hiển thị tất cả điều ước
-            let message = "🎄 TẤT CẢ ĐIỀU ƯỚC 🎄\n\n";
+adminBtn.addEventListener("click", async () => {
+    try {
+        const response = await fetch(WEB_APP_URL);
+        const data = await response.json();
+        
+        let message = "🎄 TẤT CẢ ĐIỀU ƯỚC 🎄\n\n";
+        if (data.length === 0) {
+            message += "📭 Chưa có điều ước nào!";
+        } else {
             data.forEach((item, index) => {
-                message += `#${index + 1} — ${item.time}\n${item.wish}\n\n`;
+                message += `#${index + 1} — ${item.time || 'N/A'}\n${item.wish || 'N/A'}\n\n`;
             });
-            alert(message);
-        });
+        }
+        alert(message);
+    } catch (error) {
+        console.error("❌ OWNER LỖI:", error);
+        alert("❌ Không tải được dữ liệu!");
+    }
 });
-        .catch(err => {
-            console.error(err);
-            alert("Không thể tải dữ liệu từ Sheet! Kiểm tra lại Web App URL.");
-        });
-});
-
 
 
 function sendLetterAnimation() {
@@ -1117,4 +1118,5 @@ function sendLetterAnimation() {
     </script>
 </body>
 </html>
+
 
