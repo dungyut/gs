@@ -777,7 +777,7 @@
             if (!wish) return alert('Nhập điều ước đi chứ!');
 
             // ĐÃ CẮM ĐÚNG URL WEB APP CỦA MÀY - CHẠY 100%
-            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzTyVxPNB5Eyjza3go0xA30qQam_NB8o1Dt5MCbiNRHCV0zO4TpcZkVVz2GFWhuOTQ/exec";
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz04stS82Gfyba9vkn8aXQAL4yGqAuQg-amNtZkJt-ybBi9Hc5fINTUkGG6hbI4P3p_/exec";
 
             fetch(WEB_APP_URL, {
                 method: "POST",
@@ -1078,24 +1078,17 @@ sendBtn.addEventListener("click", () => {
 
 
 adminBtn.addEventListener("click", () => {
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz04stS82Gfyba9vkn8aXQAL4yGqAuQg-amNtZkJt-ybBi9Hc5fINTUkGG6hbI4P3p_/exec";
-
-    fetch(WEB_APP_URL)
+    fetch("https://script.google.com/macros/s/AKfycbz04stS82Gfyba9vkn8aXQAL4yGqAuQg-amNtZkJt-ybBi9Hc5fINTUkGG6hbI4P3p_/exec")  // ✅ URL MỚI
         .then(res => res.json())
         .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                alert("Chưa có ai gửi điều ước!");
-                return;
-            }
-
-            let msg = "🎄 TẤT CẢ ĐIỀU ƯỚC NGƯỜI XEM GỬI 🎄\n\n";
-
-            data.forEach((row, i) => {
-                msg += `#${i + 1} — ${row.time}\n${row.wish}\n\n`;
+            // Hiển thị tất cả điều ước
+            let message = "🎄 TẤT CẢ ĐIỀU ƯỚC 🎄\n\n";
+            data.forEach((item, index) => {
+                message += `#${index + 1} — ${item.time}\n${item.wish}\n\n`;
             });
-
-            alert(msg);
-        })
+            alert(message);
+        });
+});
         .catch(err => {
             console.error(err);
             alert("Không thể tải dữ liệu từ Sheet! Kiểm tra lại Web App URL.");
@@ -1124,3 +1117,4 @@ function sendLetterAnimation() {
     </script>
 </body>
 </html>
+
