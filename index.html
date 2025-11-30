@@ -1078,10 +1078,30 @@ sendBtn.addEventListener("click", () => {
 
 
 adminBtn.addEventListener("click", () => {
-    const saved = localStorage.getItem("wishText") || "(không có dữ liệu)";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz04stS82Gfyba9vkn8aXQAL4yGqAuQg-amNtZkJt-ybBi9Hc5fINTUkGG6hbI4P3p_/exec";
 
-    alert("🎄 Điều ước người dùng gửi là:\n\n" + saved);
+    fetch(WEB_APP_URL)
+        .then(res => res.json())
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) {
+                alert("Chưa có ai gửi điều ước!");
+                return;
+            }
+
+            let msg = "🎄 TẤT CẢ ĐIỀU ƯỚC NGƯỜI XEM GỬI 🎄\n\n";
+
+            data.forEach((row, i) => {
+                msg += `#${i + 1} — ${row.time}\n${row.wish}\n\n`;
+            });
+
+            alert(msg);
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Không thể tải dữ liệu từ Sheet! Kiểm tra lại Web App URL.");
+        });
 });
+
 
 
 function sendLetterAnimation() {
